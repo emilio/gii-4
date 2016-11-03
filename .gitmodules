@@ -4,3 +4,9 @@
 [submodule "computer-graphics/first/lib/assimp"]
 	path = computer-graphics/first/lib/assimp
 	url = https://github.com/assimp/assimp
+[submodule "computer-graphics/lib/assimp"]
+	path = computer-graphics/lib/assimp
+	url = https://github.com/assimp/assimp
+[submodule "computer-graphics/lib/glm"]
+	path = computer-graphics/lib/glm
+	url = https://github.com/g-truc/glm
