@@ -1,6 +1,6 @@
 
 .PHONY: all
-all: briefing.pdf
+all: briefing.pdf organizational-structure.pdf
 
 %.pdf: %.tex
 	xelatex -shell-escape $<
