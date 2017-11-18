@@ -75,13 +75,69 @@ impl Map {
                 }
             };
 
-            let function_name = &line[..opening_paren];
             let args = line[opening_paren + 1..closing_paren]
                 .split(',')
-                .map(|s| s.trim());
+                .map(|s| s.trim())
+                .collect::<Vec<_>>();
 
+            if args.len() != 3 {
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    format!(
+                        "Expected exactly 3 arguments at line {}, got: {:?}",
+                        i,
+                        args,
+                    ),
+                ));
+            }
+
+            let third_arg = match args[2].parse::<u32>() {
+                Ok(a) => a,
+                Err(parse_error) => {
+                    return Err(io::Error::new(
+                        io::ErrorKind::Other,
+                        parse_error
+                    ));
+                }
+            };
+
+            let function_name = &line[..opening_paren];
             match function_name {
-                "conectado" | "ubicacion" => {},
+                "conectado" => {
+                    let edge_from = EdgeId::new(args[0]);
+                    let edge_to = EdgeId::new(args[1]);
+                    let distance = third_arg;
+
+                    if edge_from == edge_to {
+                        return Err(io::Error::new(
+                            io::ErrorKind::Other,
+                            format!(
+                                "Self-referencing edges in line {}: {:?}",
+                                i,
+                                edge_from,
+                            )
+                        ));
+                    }
+
+                    // Edges are bi-directional.
+                    map.graph.entry(edge_from.clone())
+                        .or_insert_with(Vec::new)
+                        .push(Path { to: edge_to.clone(), distance });
+
+                    map.graph.entry(edge_to)
+                        .or_insert_with(Vec::new)
+                        .push(Path { to: edge_from, distance });
+                },
+                "ubicacion" => {
+                    let edge = EdgeId::new(args[0]);
+                    let item = ItemId::new(args[1]);
+                    let amount = third_arg;
+                    *map.storage
+                        .entry(edge)
+                        .or_insert_with(HashMap::default)
+                        .entry(item)
+                        .or_insert_with(|| 0) += amount;
+                },
                 _ => {
                     return Err(io::Error::new(
                         io::ErrorKind::Other,
@@ -93,9 +149,6 @@ impl Map {
                     ));
                 }
             };
-
-            println!("{:?}, {:?}", function_name, args.collect::<Vec<_>>());
-            // TODO.
         }
 
         Ok(map)
