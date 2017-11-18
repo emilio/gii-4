@@ -4,14 +4,14 @@ extern crate clap;
 use std::io;
 use std::rc::Rc;
 use std::collections::HashMap;
-use std::path::Path as StdPath;
+use std::path::Path;
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
-struct EdgeId(Rc<String>);
+struct NodeId(Rc<String>);
 
-impl EdgeId {
+impl NodeId {
     pub fn new<T: Into<String>>(name: T) -> Self {
-        EdgeId(Rc::new(name.into()))
+        NodeId(Rc::new(name.into()))
     }
 }
 
@@ -25,22 +25,22 @@ impl ItemId {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct Path {
-    to: EdgeId,
+struct Edge {
+    to: NodeId,
     distance: u32,
 }
 
 #[derive(Debug, Default)]
 struct Map {
-    /// A map from an edge to all the paths that you can take from it.
-    graph: HashMap<EdgeId, Vec<Path>>,
-    /// A map from an edge to the storage, which can contain items, and for each
+    /// A map from an node to all the paths that you can take from it.
+    graph: HashMap<NodeId, Vec<Edge>>,
+    /// A map from an node to the storage, which can contain items, and for each
     /// item the amount of items of that kind that exist.
-    storage: HashMap<EdgeId, HashMap<ItemId, u32>>,
+    storage: HashMap<NodeId, HashMap<ItemId, u32>>,
 }
 
 impl Map {
-    pub fn from_file(file_name: &StdPath) -> Result<Self, io::Error> {
+    pub fn from_file(file_name: &Path) -> Result<Self, io::Error> {
         use std::fs::File;
         use std::io::{BufRead, BufReader};
 
@@ -104,36 +104,36 @@ impl Map {
             let function_name = &line[..opening_paren];
             match function_name {
                 "conectado" => {
-                    let edge_from = EdgeId::new(args[0]);
-                    let edge_to = EdgeId::new(args[1]);
+                    let node_from = NodeId::new(args[0]);
+                    let node_to = NodeId::new(args[1]);
                     let distance = third_arg;
 
-                    if edge_from == edge_to {
+                    if node_from == node_to {
                         return Err(io::Error::new(
                             io::ErrorKind::Other,
                             format!(
-                                "Self-referencing edges in line {}: {:?}",
+                                "Self-referencing nodes in line {}: {:?}",
                                 i,
-                                edge_from,
+                                node_from,
                             )
                         ));
                     }
 
                     // Edges are bi-directional.
-                    map.graph.entry(edge_from.clone())
+                    map.graph.entry(node_from.clone())
                         .or_insert_with(Vec::new)
-                        .push(Path { to: edge_to.clone(), distance });
+                        .push(Edge { to: node_to.clone(), distance });
 
-                    map.graph.entry(edge_to)
+                    map.graph.entry(node_to)
                         .or_insert_with(Vec::new)
-                        .push(Path { to: edge_from, distance });
+                        .push(Edge { to: node_from, distance });
                 },
                 "ubicacion" => {
-                    let edge = EdgeId::new(args[0]);
+                    let node = NodeId::new(args[0]);
                     let item = ItemId::new(args[1]);
                     let amount = third_arg;
                     *map.storage
-                        .entry(edge)
+                        .entry(node)
                         .or_insert_with(HashMap::default)
                         .entry(item)
                         .or_insert_with(|| 0) += amount;
@@ -160,14 +160,14 @@ fn main() {
         .args_from_usage(
             "<input>             'File where the prolog statements that define \
                                   the map are contained'
-             -s, --start=[start] 'The start edge, defaults to \"S\"'
-             -e, --end=[end]     'The end edge, defaults to \"T\"'",
+             -s, --start=[start] 'The start node, defaults to \"S\"'
+             -e, --end=[end]     'The end node, defaults to \"T\"'",
         )
         .get_matches();
 
-    let input = StdPath::new(matches.value_of("input").unwrap());
-    let start = EdgeId::new(matches.value_of("start").unwrap_or("S"));
-    let end = EdgeId::new(matches.value_of("end").unwrap_or("T"));
+    let input = Path::new(matches.value_of("input").unwrap());
+    let start = NodeId::new(matches.value_of("start").unwrap_or("S"));
+    let end = NodeId::new(matches.value_of("end").unwrap_or("T"));
 
     let map = Map::from_file(&input).expect("Couldn't read map");
 
