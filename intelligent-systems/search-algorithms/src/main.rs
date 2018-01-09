@@ -40,11 +40,14 @@ struct Order {
 }
 
 impl Order {
-    pub fn from_file(path: &Path) -> Result<Self, io::Error> {
+    pub fn from_file<P>(path: P) -> Result<Self, io::Error>
+    where
+        P: AsRef<Path>,
+    {
         use std::fs::File;
         use std::io::{BufRead, BufReader};
 
-        let file = BufReader::new(File::open(path)?);
+        let file = BufReader::new(File::open(path.as_ref())?);
         let mut order_items = HashMap::default();
         let mut total_items = 0;
 
@@ -189,11 +192,14 @@ impl Node {
 }
 
 impl Map {
-    pub fn from_file(file_name: &Path) -> Result<Self, io::Error> {
+    pub fn from_file<P>(path: P) -> Result<Self, io::Error>
+    where
+        P: AsRef<Path>,
+    {
         use std::fs::File;
         use std::io::{BufRead, BufReader};
 
-        let file = BufReader::new(File::open(file_name)?);
+        let file = BufReader::new(File::open(path.as_ref())?);
         let mut map = Map::default();
 
         for (i, line) in file.lines().enumerate() {
@@ -430,8 +436,8 @@ fn main() {
         )
         .get_matches();
 
-    let map = Path::new(matches.value_of("map").unwrap());
-    let order = Path::new(matches.value_of("order").unwrap());
+    let map = matches.value_of("map").unwrap();
+    let order = matches.value_of("order").unwrap();
     let start = NodeId::new(matches.value_of("start").unwrap_or("S"));
     let end = NodeId::new(matches.value_of("end").unwrap_or("T"));
 
@@ -454,5 +460,24 @@ fn main() {
             }
             last_items_left = item.partial_order.items_left;
         }
+
+        if let Some(last) = optimal_path.last() {
+            println!("Distance: {:?}", last.distance_walked_so_far);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_complex_order() {
+        let map = Map::from_file("map2.prolog").unwrap();
+        let order = Order::from_file("orders/m2-hard.txt").unwrap();
+        let path = map.solve(&NodeId::new("S"), &NodeId::new("T"), &order);
+        assert!(path.is_ok());
+        let path = path.unwrap();
+        let last = path.last().unwrap();
+        assert_eq!(last.distance_walked_so_far, 50);
     }
 }
