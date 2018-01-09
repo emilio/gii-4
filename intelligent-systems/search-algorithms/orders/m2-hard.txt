@@ -1,0 +1,2 @@
+boligrafos,800
+patatas,300

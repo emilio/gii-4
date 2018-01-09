@@ -169,7 +169,7 @@ impl Ord for Node {
 
 impl Node {
     fn heuristic_score(&self) -> u32 {
-        self.distance_walked_so_far + self.partial_order.items_left
+        self.distance_walked_so_far
     }
 
     /// Transition from one map to another, taking all the available items to
