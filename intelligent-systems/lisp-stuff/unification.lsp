@@ -11,7 +11,7 @@
 (defun is-var (pat)
   (and (listp pat)
        (equal (length pat) 2)
-       (equal (car pat) 'var)))
+       (equal (car pat) '?)))
 
 ; This function receives two patterns, the first of which is a variable, and
 ; then tries to match it, potentially adding a substitution to `substitutions`.
@@ -54,17 +54,15 @@
     (T (unify (cdr pat1) (cdr pat2) (unify (car pat1) (car pat2) substitutions)))))
 
 ; Tests
-(assert (equal (match '(var x) '(var y) '((x . (var y)))) '((x . (var y)))))
-(assert (equal (match '(var x) '(var y) '((x . 42))) '((y . 42) (x . 42))))
+(assert (equal (match '(? x) '(? y) '((x . (? y)))) '((x . (? y)))))
+(assert (equal (match '(? x) '(? y) '((x . 42))) '((y . 42) (x . 42))))
 ; Trivial case: unify(42, 43) -> should fail
 (assert (equal (unify 42 43) 'failure))
 ; Trivial case: unify(42, 42)
 (assert (equal (unify 42 42) nil))
 ; Trivial case: unify(x, x)
-(assert (equal (unify '(var x) '(var x)) nil))
+(assert (equal (unify '(? x) '(? x)) nil))
 ; Easy case: unify(42, x) -> { x: 42 }
-(assert (equal (unify 42 '(var x)) '((x . 42))))
-; Easy case: unify(42, x) -> { x: 42 }
-(assert (equal (unify 42 '(var x)) '((x . 42))))
+(assert (equal (unify 42 '(? x)) '((x . 42))))
 ; Easy case: unify(x, y) -> { x: y }
-(assert (equal (unify '(var x) '(var y)) '((x . (var y)))))
+(assert (equal (unify '(? x) '(? y)) '((x . (? y)))))
