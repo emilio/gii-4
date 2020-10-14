@@ -1,7 +1,7 @@
 # This is a really simple makefile to allow converting my markdown notes to
 # pdf.
 #
-# Note that `notes.pdf` is ignored from the tree explicitely in this folder's
+# Note that `notes.pdf` is ignored from the tree explicitly in this folder's
 # gitignore.
 #
 # As of today (15/09/2015), the ideal folder structure would be:
