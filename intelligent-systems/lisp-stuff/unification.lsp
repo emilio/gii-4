@@ -4,7 +4,7 @@
 ;   Structures and strategies for complex problem solving
 ; by George F. Luger and William A. Stubblefield
 
-; We define variables as lists where the first item is 'var, and the second the
+; We define variables as lists where the first item is '?, and the second the
 ; variable name.
 ;
 ; This function returns whether a pattern is a variable.

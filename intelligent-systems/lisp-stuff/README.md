@@ -17,7 +17,7 @@ otra, eliminando esa necesidad.
 
 Esta implementación devuelve un mapa de variable a valor de esa variable. Los
 valores de una variable pueden ser otras variables a su vez. Por ejemplo,
-`(unify '(var x) '(var y))` devuelve `x: '(var y)`.
+`(unify '(? x) '(? y))` devuelve `x: '(? y)`.
 
 Es posible que en otra parte de la expresión consigamos resolver `y: 4`, pero
 para llegar a `x: 4` sólo tendríamos que modificar el mapa aplicando las
