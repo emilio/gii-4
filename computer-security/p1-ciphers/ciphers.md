@@ -3,6 +3,7 @@ title: Práctica 1 - Cifrado
 subtitle: Seguridad de Sistemas Informáticos
 author:
   - Emilio Cobos Álvarez (70912324N)
+  - Carlos Martín García (70882826T)
 lang: es
 numbersections: true
 links-as-notes: true
@@ -195,3 +196,141 @@ algún otro campo interesante:
 
  * `RSA`: El algoritmo usado por la clave pública del certificado SSL del
    servidor.
+
+# Cifrado asimétrico
+
+## Cifrar un mensaje con GnuPG
+
+### Generación de las claves
+
+Emilio ya tenía una clave `rsa4096` que utiliza para firmar sus commits
+e intercambiar correo. La parte pública de la clave está
+[aquí](https://crisal.io/emilio.pgp.txt). Para exportarla ha usado:
+
+```
+$ gpg --armor --export E776A50333C0C653FC8ADE00E1152D0994E4BF8A >emilio.pgp.txt
+```
+
+Para generar su clave RSA Carlos usó la interfaz de Kleopatra para Windows.
+
+![Interfaz de Kleopatra para Windows](kleopatra-1.jpg)
+
+### Importación de las claves
+
+Tras la generación de claves, intercambiamos nuestras llaves públicas tras
+intercambiarlas exportadas como ASCII. Para importar la clave de Carlos, Emilio
+ejecutó:
+
+```
+$ gpg --import ~/Downloads/Carlos.txt
+```
+
+Y tras ello Emilio firmó la clave de Carlos (para que sea considerada fiable).
+
+```
+$ gpg --edit-key MamaJuana
+gpg (GnuPG) 2.2.23; Copyright (C) 2020 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+
+pub  rsa4096/E320B4EAC9869398
+     created: 2020-10-28  expires: 2022-10-28  usage: SC
+     trust: unknown       validity: unknown
+sub  rsa4096/355EFA2A6B1855F3
+     created: 2020-10-28  expires: 2022-10-28  usage: E
+[ unknown] (1). MamaJuana
+
+gpg> trust
+pub  rsa4096/E320B4EAC9869398
+     created: 2020-10-28  expires: 2022-10-28  usage: SC
+     trust: unknown       validity: unknown
+sub  rsa4096/355EFA2A6B1855F3
+     created: 2020-10-28  expires: 2022-10-28  usage: E
+[ unknown] (1). MamaJuana
+
+Please decide how far you trust this user to correctly verify other users' keys
+(by looking at passports, checking fingerprints from different sources, etc.)
+
+  1 = I don't know or won't say
+  2 = I do NOT trust
+  3 = I trust marginally
+  4 = I trust fully
+  5 = I trust ultimately
+  m = back to the main menu
+
+Your decision? 4
+
+pub  rsa4096/E320B4EAC9869398
+     created: 2020-10-28  expires: 2022-10-28  usage: SC
+     trust: full          validity: unknown
+sub  rsa4096/355EFA2A6B1855F3
+     created: 2020-10-28  expires: 2022-10-28  usage: E
+[ unknown] (1). MamaJuana
+Please note that the shown key validity is not necessarily correct
+unless you restart the program.
+
+gpg> sign
+
+pub  rsa4096/E320B4EAC9869398
+     created: 2020-10-28  expires: 2022-10-28  usage: SC
+     trust: full          validity: unknown
+ Primary key fingerprint: 1528 CE98 ADF1 BDD8 D4E3  0C1F E320 B4EA C986 9398
+
+     MamaJuana
+
+This key is due to expire on 2022-10-28.
+Are you sure that you want to sign this key with your
+key "Emilio Cobos Álvarez <emilio@crisal.io>" (E1152D0994E4BF8A)
+
+Really sign? (y/N) y
+gpg> save
+```
+
+### Cifrado y firma de ficheros
+
+Tras esto, Emilio le ha enviado un fichero simple a Carlos, tanto cifrado como
+firmado:
+
+```
+$ echo 'Hola, Carlos!' > importante.txt
+$ gpg -r MamaJuana --sign --encrypt importante.txt
+```
+
+Esto deja el fichero firmado y cifrado en `importante.txt.gpg`. Carlos cifra un
+pequeño `.gitignore` que tenía en su Escritorio.
+
+![Proceso de cifrado con Kleopatra](carlos-cifrado.jpg)
+
+Una vez intercambian los ficheros cifrados y firmados se descifran
+respectivamente:
+
+```
+$ gpg --decrypt gitignore.gpg >gitignore.txt
+gpg: encrypted with 4096-bit RSA key, ID 355EFA2A6B1855F3, created 2020-10-28
+      "MamaJuana"
+gpg: encrypted with 4096-bit RSA key, ID 0AC3B8E770BECBCA, created 2018-12-26
+      "Emilio Cobos Álvarez <emilio@crisal.io>"
+gpg: Signature made Wed 28 Oct 2020 09:22:36 PM CET
+gpg:                using RSA key 1528CE98ADF1BDD8D4E30C1FE320B4EAC9869398
+gpg: Good signature from "MamaJuana" [full]
+$ cat gitignore.txt
+node_modules/
+
+*/tablas/*.txt
+```
+
+![Proceso de descifrado con Kleopatra](carlos-descifrado.jpg)
+
+Por curiosidad, Carlos también envió a Emilio una versión del Quijote en texto
+plano.
+
+#### Tamaño de los ficheros
+
+Como se sugiere en el enunciado de la práctica, comparamos el tamaño de los
+ficheros cifrados y planos.
+
+ * `importante.txt`: 14 bytes
+ * `importante.txt.pgp`: 1.2 kB (1201 bytes)
+ * `gitignore.gpg`: 1.7 kB (1731 bytes)
+ * `gitignore`: 31 bytes
