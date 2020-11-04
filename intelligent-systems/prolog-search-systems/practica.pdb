@@ -42,7 +42,44 @@ rutaIdeologica(CURRENT, GOAL, CURRENT_PATH, OUT):-
   \+ contains(CURRENT_PATH, GOAL),
   rutaIdeologica(NEXT, GOAL, [NEXT|CURRENT_PATH], OUT).
 
+% Given the current node and its predecessors (the whole path up to now), and
+% the node we're going to visit next (NODE), return a list with the new node,
+% the current one, and all the predecessors like:
+%
+% [v(a, b), v(c, d), PREDECESSORS]
+%
+% We use this to keep the whole path up until a given node.
+appendPredecesors(CURRENT, PREDECESSORS, NODE, OUT):-
+  append([NODE, CURRENT], PREDECESSORS, OUT).
+
+% Inspired in https://stackoverflow.com/questions/34082799/breadth-first-search-in-prolog
+rutaIdeologicaBFSInternal(v(NOMBRE_A_CONVENCER, _), [[v(NOMBRE_A_CONVENCER, CARGA)|PATH]|_], _, [v(NOMBRE_A_CONVENCER, CARGA)|PATH]):-
+  true.
+
+rutaIdeologicaBFSInternal(GOAL, [[CURRENT|PREDECESSORS]|REST], VISITED, OUT):-
+  findall(
+    NEXT,
+    (
+      convence(CURRENT, NEXT),
+      \+ contains(VISITED, NEXT),
+      \+ contains([CURRENT|PREDECESSORS], GOAL)
+    ),
+    FOLLOWER_NODES
+  ),
+  % Turn FOLLOWER_NODES from a list of v(a, b) to a list of complete paths.
+  maplist(appendPredecesors(CURRENT, PREDECESSORS), FOLLOWER_NODES, FOLLOWERS),
+  % Append FOLLOWERS to the queue.
+  append(REST, FOLLOWERS, NEW_QUEUE),
+  rutaIdeologicaBFSInternal(GOAL, NEW_QUEUE, [CURRENT|VISITED], OUT).
+
+rutaIdeologicaBFS(CURRENT, GOAL, _, OUT):-
+  rutaIdeologicaBFSInternal(GOAL, [[CURRENT]], [], OUT).
+
 /* Main goal */
 principal:-
   rutaIdeologica(v(vidal,0.5),v(luis,CVL),[v(vidal,0.5)],ListaConversion),
+  pinta(ListaConversion).
+
+principal2:-
+  rutaIdeologicaBFS(v(vidal,0.5),v(luis,CVL),[v(vidal,0.5)],ListaConversion),
   pinta(ListaConversion).
