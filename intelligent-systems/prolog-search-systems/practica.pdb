@@ -1,0 +1,48 @@
+/* List of facts coming from the statement of the problem */
+:- include('contacto.pdb').
+
+% Contact is bi-directional, see https://stackoverflow.com/a/805182 for
+% something more obscure we could use instead.
+puedecontactar(P1,P2,K):- contacto(P2,P1,K).
+puedecontactar(P1,P2,K):- contacto(P1,P2,K).
+
+/* Simple print */
+pinta([]).
+pinta([H|T]) :- write(H), nl, pinta(T).
+
+contains([], _) :- fail.
+contains([H|_], H).
+contains([_|T], C) :- contains(T, C).
+
+/*
+ * El Votante_Convencido  CONVENCE  Votante_A_Convencer si El
+ * Votante_Convencido tiene una CargaIdeológicaConvencidosignificativa (mayor
+ * que 0.09) y tiene un contacto con el Votante_A_Convencer con un factorK Y
+ * Hace que la CargaIdeológicaAConvencer sea factorK*CargaIdeológicaConvencido Y
+ * El Votante_A_Convencer tiene una CargaIdeológicaAConvencerresultante
+ * significativa (mayor 0.09) YModifica Carga_Ideologica del Votante_A_Convencer
+ */
+convence(v(NOMBRE_CONVENCIDO, CARGA), v(NOMBRE_A_CONVENCER, R)):-
+  CARGA > 0.09,
+  puedecontactar(NOMBRE_CONVENCIDO, NOMBRE_A_CONVENCER, K),
+  CARGA_RESULTANTE is K * CARGA,
+  CARGA_RESULTANTE > 0.09,
+  R is CARGA_RESULTANTE.
+
+% Base case: route to itself, we're done!
+rutaIdeologica(v(NOMBRE_A_CONVENCER, _), v(NOMBRE_A_CONVENCER, _), CURRENT_PATH, CURRENT_PATH):-
+  true.
+
+rutaIdeologica(CURRENT, GOAL, CURRENT_PATH, OUT):-
+  convence(CURRENT, NEXT),
+  % \+ is equivalent to logical not.
+  \+ contains(CURRENT_PATH, NEXT),
+  % We need to check whether the goal is not already there, because otherwise
+  % you could get into feedback loops for contacts where K > 1.0.
+  \+ contains(CURRENT_PATH, GOAL),
+  rutaIdeologica(NEXT, GOAL, [NEXT|CURRENT_PATH], OUT).
+
+/* Main goal */
+principal:-
+  rutaIdeologica(v(vidal,0.5),v(luis,CVL),[v(vidal,0.5)],ListaConversion),
+  pinta(ListaConversion).
