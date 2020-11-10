@@ -201,7 +201,9 @@ algún otro campo interesante:
 
 ## Cifrar un mensaje con GnuPG
 
-### Generación de las claves
+### RSA
+
+#### Generación de las claves
 
 Emilio ya tenía una clave `rsa4096` que utiliza para firmar sus commits
 e intercambiar correo. La parte pública de la clave está
@@ -215,7 +217,7 @@ Para generar su clave RSA Carlos usó la interfaz de Kleopatra para Windows.
 
 ![Interfaz de Kleopatra para Windows](kleopatra-1.jpg)
 
-### Importación de las claves
+#### Importación de las claves
 
 Tras la generación de claves, intercambiamos nuestras llaves públicas tras
 intercambiarlas exportadas como ASCII. Para importar la clave de Carlos, Emilio
@@ -287,7 +289,7 @@ Really sign? (y/N) y
 gpg> save
 ```
 
-### Cifrado y firma de ficheros
+#### Cifrado y firma de ficheros
 
 Tras esto, Emilio le ha enviado un fichero simple a Carlos, tanto cifrado como
 firmado:
@@ -322,7 +324,7 @@ node_modules/
 
 ![Proceso de descifrado con Kleopatra](carlos-descifrado.jpg)
 
-Por curiosidad, Carlos también envió a Emilio una versión del Quijote en texto
+Por curiosidad, Carlos también envió a Emilio un capítulo del Quijote en texto
 plano.
 
 #### Tamaño de los ficheros
@@ -334,3 +336,239 @@ ficheros cifrados y planos.
  * `importante.txt.pgp`: 1.2 kB (1201 bytes)
  * `gitignore.gpg`: 1.7 kB (1731 bytes)
  * `gitignore`: 31 bytes
+ * `quijote.txt.gpg`: 116.2 kB (116230 bytes)
+ * `quijote.txt`: 319 kB (319031 bytes)
+
+La razón por la que el tamaño de los ficheros cifrados puede ser menor que el
+texto plano es que gpg por defecto aplica compresión durante el cifrado. Para
+evitar eso, podríamos haber utilizado el parámetro `--compress-algo=none`. Por
+defecto, gpg utiliza compresión `zip`, pero también podría utilizar `bzip2`
+o `zlib`, por ejemplo.
+
+Según el manual:
+
+> If this option is not used, the default behavior is to examine the recipient
+> key preferences to see which algorithms the recipient sup‐ ports. If all else
+> fails, ZIP is used for maximum compatibility.
+
+### El Gamal + DSA
+
+#### Generación de las claves
+
+Para generar una clave gpg usando El Gamal + DSA, Emilio utilizó `gpg
+--full-generate-key`:
+
+```
+$ gpg --full-generate-key
+gpg (GnuPG) 2.2.23; Copyright (C) 2020 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Please select what kind of key you want:
+   (1) RSA and RSA (default)
+   (2) DSA and Elgamal
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+  (14) Existing key from card
+Your selection? 2
+DSA keys may be between 1024 and 3072 bits long.
+What keysize do you want? (2048)
+Requested keysize is 2048 bits
+Please specify how long the key should be valid.
+         0 = key does not expire
+      <n>  = key expires in n days
+      <n>w = key expires in n weeks
+      <n>m = key expires in n months
+      <n>y = key expires in n years
+Key is valid for? (0) 0
+Key does not expire at all
+Is this correct? (y/N) y
+
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: Emilio Cobos Álvarez
+Email address: emiliocobos+practica1b2@usal.es
+Comment: Throwaway
+You are using the 'utf-8' character set.
+You selected this USER-ID:
+    "Emilio Cobos Álvarez (Throwaway) <emiliocobos+practica1b2@usal.es>"
+
+Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+gpg: WARNING: some OpenPGP programs can't handle a DSA key with this digest size
+We need to generate a lot of random bytes. It is a good idea to perform
+some other action (type on the keyboard, move the mouse, utilize the
+disks) during the prime generation; this gives the random number
+generator a better chance to gain enough entropy.
+gpg: key B3A0AC7C9C54CD1D marked as ultimately trusted
+gpg: revocation certificate stored as '/home/emilio/.gnupg/openpgp-revocs.d/15F4AB8B7D3E4173AB87F28EB3A0AC7C9C54CD1D.rev'
+public and secret key created and signed.
+
+pub   dsa2048 2020-11-10 [SC]
+      15F4AB8B7D3E4173AB87F28EB3A0AC7C9C54CD1D
+uid                      Emilio Cobos Álvarez (Throwaway) <emiliocobos+practica1b2@usal.es>
+sub   elg2048 2020-11-10 [E]
+```
+
+Para exportar las claves, se utilizó el mismo proceso que con RSA, pero con la
+la clave nueva:
+
+```
+$ gpg --armor --export 15F4AB8B7D3E4173AB87F28EB3A0AC7C9C54CD1D >emilio.asc
+```
+
+Carlos usó Kleopatra para generar la suya:
+
+![Generación de clave DSA + Elgamal con Kleopatra](dsa-keygen-kleopatra.jpg)
+
+#### Importación de las claves, cifrado, firma, y descifrado
+
+Estos procesos son exactamente iguales que en la anterior sección, por lo que se
+omiten por brevedad.
+
+\clearpage
+
+## Cifrar un mensaje con OpenSSL
+
+Para generar una clave privada RSA:
+
+```
+$ openssl genpkey -algorithm rsa >emilio.pkey
+```
+
+Y para extraer la clave pública:
+
+```
+$ openssl pkey -in emilio.pkey -pubout >emilio.asc
+```
+
+Eso genera una clave con los parámetros por defecto (2048 bits, 2 primos,
+exponente público 65537, que podríamos cambiar con los siguientes parámetros:
+
+```
+RSA Key Generation Options
+    rsa_keygen_bits:numbits
+        The number of bits in the generated key. If not specified 2048 is used.
+
+    rsa_keygen_primes:numprimes
+        The number of primes in the generated key. If not specified 2 is used.
+
+    rsa_keygen_pubexp:value
+        The RSA public exponent value. This can be a large decimal or
+        hexadecimal value if preceded by 0x. Default value is 65537.
+```
+
+Tampoco hemos puesto contraseña, aunque lo podríamos haber hecho usando el
+argumento `--pass`.
+
+Carlos usa Windows y la versión antigua de OpenSSL que está en Diaweb, que no
+tiene el comando `genpkey`, por lo que usó `genrsa`. Los parámetros por defecto
+de su clave son diferentes (la clave sólo tiene 512 bits como se muestra en la
+captura).
+
+![Generación de clave desde Windows](rsa-powershell.jpg)
+
+![Exportación de la clave pública desde Windows](rsa-powershell-2.jpg)
+
+Tras eso Emilio y Carlos intercambian sus claves públicas.
+
+Para cifrar:
+
+```
+$ echo "Hola Carlos" > hola.txt
+$ openssl pkeyutl -encrypt -in hola.txt -out hola.enc -pubin -inkey carlos.pub.txt
+```
+
+Nótese que usamos un tamaño de fichero muy pequeño, porque OpenSSL no divide los
+archivos grandes automáticamente.
+
+Carlos realiza lo mismo en PowerShell:
+
+![Cifrado con RSA desde Windows](rsa-powershell-3.png)
+
+Una vez intercambiados los archivos cifrados lo desencriptamos:
+
+```
+$ openssl pkeyutl -decrypt -in Textocorto.txt.enc -inkey emilio.pkey
+Hola Emilio
+```
+
+![Descifrado con RSA desde Windows](rsa-powershell-4.png)
+
+
+## Generar firma de mensajes
+
+### Generar firma (separada) de un mensaje usando GnuPG
+
+Para generar una firma de un fichero de texto:
+
+```
+$ gpg --armor --sign-with E776A50333C0C653FC8ADE00E1152D0994E4BF8A \
+      --sign --detach-sign Quijote.txt
+```
+
+![Firma via Kleopatra](sign-kleopatra.jpg)
+
+Se envían los ficheros en texto plano, y la firma adjunta también. Para
+verificar la firma:
+
+```
+$ gpg --verify Quijote.txt.sig Quijote.txt
+gpg: Signature made Tue 10 Nov 2020 07:50:28 PM CET
+gpg:                using RSA key E776A50333C0C653FC8ADE00E1152D0994E4BF8A
+gpg: Good signature from "Emilio Cobos Álvarez <emilio@crisal.io>" [ultimate]
+
+$ gpg --verify Textocorto.txt.sig Textocorto.txt
+gpg: Signature made Tue 10 Nov 2020 07:54:26 PM CET
+gpg:                using RSA key 1528CE98ADF1BDD8D4E30C1FE320B4EAC9869398
+gpg: Good signature from "MamaJuana" [full]
+```
+
+### Generar una firma del compendio de un mensaje usando OpenSSL
+
+Para generar el compendio vamos a utilizar el subcomando `dgst`.
+Convenientemente, este subcomando también tiene opciones para firmar (`-sign`)
+y verificar firmas (`-verify`).
+
+Esto parecía lo suficientemente fácil:
+
+```
+$ openssl dgst -sha256 -out Quijote.sig -sign emilio.pkey Quijote.txt
+$ openssl dgst -verify emilio.asc -sha256 -signature Quijote.sig Quijote.txt
+Verified OK
+```
+
+Pero hay un gotcha, y es que **no está generando la firma en ASCII**, lo cual es
+un requisito del enunciado.
+
+Para ello tenemos que complicarnos un poco más, porque aunque OpenSSL puede
+generar una cadena hexadecimal via `-hex`, no puede verificarla automáticamente.
+Según el manual:
+
+> Hex signatures cannot be verified using openssl. Instead, use `xxd -r` or
+> similar program to transform the hex signature into a binary signature prior
+> to verification.
+
+Una complicación aún mayor es que cuando generamos una firma con `-hex`, hay un
+prefijo tal que así:
+
+```
+RSA-SHA256(Quijote.txt)= 03c2281....
+```
+
+Que `xxd` no sabe leer (hasta el `=`) y tendríamos que quitarlo a mano. No es
+difícil, pero es más sencillo usar `xxd` para formatear la firma también:
+
+```
+$ openssl dgst -sha256 -sign emilio.pkey Quijote.txt | xxd -p > Quijote.sig
+$ cat Quijote.sig
+03c228109357a3d67e8ffa448d8834f637d075c67798986313f82f8a59bc
+...
+$ cat Quijote.sig | xxd -r -p > Quijote.sig.bin
+$ openssl dgst -verify emilio.asc -sha256 -signature Quijote.sig.bin Quijote.txt
+Verified OK
+$ rm Quijote.sig.bin
+```
