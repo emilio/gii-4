@@ -3,7 +3,7 @@ title: Práctica 1 - Cifrado
 subtitle: Seguridad de Sistemas Informáticos
 author:
   - Emilio Cobos Álvarez (70912324N)
-  - Carlos Martín García (70882826T)
+  - Juan Carlos Martín García (70882826T)
 lang: es
 numbersections: true
 links-as-notes: true
