@@ -1,3 +1,4 @@
+include ../../session.mk
 
 WINEPREFIX?="$(HOME)/.wine32"
 WINEBUILDPATH?="$(HOME)/src/wine/build"
