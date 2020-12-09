@@ -103,6 +103,7 @@ pub struct Contact {
     pub from: NodeId,
     pub to: NodeId,
     pub k: f32,
+    pub distance: Option<f32>,
 }
 
 #[derive(Default, Debug)]
@@ -189,9 +190,9 @@ impl Input {
             };
 
             let args = args.split(",").map(|arg| arg.trim()).collect::<Vec<_>>();
-            if args.len() != 3 {
+            if args.len() != 3 && args.len() != 4 {
                 return Err(format!(
-                    "Expected three arguments, got {} at line {}",
+                    "Expected three or four arguments, got {} at line {}",
                     args.len(),
                     lineno
                 )
@@ -201,17 +202,23 @@ impl Input {
             let first = nodes.get_or_insert(args[0].to_owned());
             let second = nodes.get_or_insert(args[1].to_owned());
             let k = args[2].parse::<f32>()?;
+            let distance = match args.get(3) {
+                Some(d) => Some(d.parse::<f32>()?),
+                None => None,
+            };
 
             contacts.get_mut(first).push(Contact {
                 from: first,
                 to: second,
                 k,
+                distance,
             });
 
             contacts.get_mut(second).push(Contact {
                 from: second,
                 to: first,
                 k,
+                distance,
             });
         }
 
@@ -243,10 +250,11 @@ impl Input {
             println!("Edges from {} ({:?})", self.node_name(node), node);
             for edge in self.edges_from(node) {
                 println!(
-                    "  -> {} ({:?}) with k={}",
+                    "  -> {} ({:?}) with k={}, distance={:?}",
                     self.node_name(edge.to),
                     edge.to,
-                    edge.k
+                    edge.k,
+                    edge.distance
                 );
             }
         }

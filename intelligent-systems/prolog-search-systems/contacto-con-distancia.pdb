@@ -1,0 +1,9 @@
+contacto(pepe,juan,0.3,5.0).
+contacto(juan,manolo,0.8,5.0).
+contacto(manolo,luis,4.0,2.0).
+contacto(josemari,lucia,4.0,1.5).
+contacto(raul,josemari,3.0,1.3).
+contacto(luis,felipe,2.0,1.0).
+contacto(manolo,felipe,2.5,1.0).
+contacto(pepe,vidal,1.0,1.0).
+contacto(pepe,luis,0.5,90.0).

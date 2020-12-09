@@ -1,34 +1,51 @@
 #![allow(dead_code)]
 
 use std::error::Error;
+use std::sync::atomic::{Ordering, AtomicBool};
+
+pub static DEBUG: AtomicBool = AtomicBool::new(false);
+
+#[macro_export]
+macro_rules! debug {
+    ($($arg:tt)*) => {
+        if crate::DEBUG.load(std::sync::atomic::Ordering::Relaxed) {
+            eprintln!($($arg)*);
+        }
+    }
+}
 
 mod input;
 mod solver;
 
+const USAGE: &str = "Usage: program <input-file> <initial-state> <final-state> <use-heuristic>";
+
 fn main() -> Result<(), Box<dyn Error>> {
     let args = std::env::args().collect::<Vec<_>>();
-    if args.len() != 2 {
-        return Err("Need just one argument for the input file".into());
+    if args.len() != 5 {
+        return Err(USAGE.into());
     }
+
+    DEBUG.store(std::env::var_os("DEBUG").is_some(), Ordering::Relaxed);
 
     let input = input::Input::parse(&args[1])?;
 
-    // input.dump();
+    if DEBUG.load(Ordering::Relaxed) {
+        input.dump();
+    }
 
-    // TODO(emilio): Probably don't hard-code these (take them from the CLI
-    // instead?).
     let initial_state = solver::State {
-        node: input.node_by_name("vidal").unwrap(),
+        node: input.node_by_name(&args[2]).unwrap(),
         cost: 0.0,
         k_so_far: 0.5,
     };
 
     let goal = solver::Goal {
-        node: input.node_by_name("luis").unwrap(),
+        node: input.node_by_name(&args[3]).unwrap(),
     };
 
-    let solution = solver::Solver::new(initial_state, &input, goal).solve();
+    let use_heuristic = &args[4] != "0";
 
+    let solution = solver::Solver::new(initial_state, &input, goal, use_heuristic).solve();
     let solution = match solution {
         Some(s) => s,
         None => return Err("No solution found".into()),

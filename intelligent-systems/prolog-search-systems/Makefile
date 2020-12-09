@@ -11,4 +11,6 @@ run-part-1-2: practica.pdb contacto.pdb
 
 .PHONY: run-part-2-1
 run-part-2-1:
-	cd part-2 && cargo run -- ../contacto.pdb
+	cd part-2 && cargo run -- ../contacto.pdb vidal luis 1
+	cd part-2 && cargo run -- ../contacto-con-distancia.pdb vidal luis 1
+	cd part-2 && cargo run -- ../contacto-con-distancia.pdb vidal luis 0

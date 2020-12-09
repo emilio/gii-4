@@ -4,8 +4,6 @@ use std::collections::BinaryHeap;
 
 /// A state in our heap (that is, node + our cost so far + the k value from the
 /// exercise).
-///
-/// TODO: In order to make it a proper A* we need an heuristic function...
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct State {
     pub node: NodeId,
@@ -45,25 +43,37 @@ impl Ord for State {
 }
 
 #[derive(Debug)]
+struct CameFrom {
+    /// The state we came from, including the original cost.
+    state: State,
+    /// The total cost, including traversing the edge to the node. Note that
+    /// this is importantly different from self.state.cost, and is the real
+    /// thing we should compare against for path-building purposes.
+    cost: f32,
+}
+
+#[derive(Debug)]
 pub struct Solver<'a> {
     initial_state: State,
     input: &'a Input,
     goal: Goal,
+    use_heuristic: bool,
     // We use Reverse here to do a min-heap (and thus extract the elements with
     // less cost first) rather than a regular binary heap, see:
     // https://doc.rust-lang.org/std/collections/struct.BinaryHeap.html#min-heap
     open: BinaryHeap<cmp::Reverse<State>>,
     // A map from a node to the best path so far, along with the cost of
     // actually visiting it.
-    came_from: NodeMap<State>,
+    came_from: NodeMap<CameFrom>,
 }
 
 impl<'a> Solver<'a> {
-    pub fn new(initial_state: State, input: &'a Input, goal: Goal) -> Self {
+    pub fn new(initial_state: State, input: &'a Input, goal: Goal, use_heuristic: bool) -> Self {
         Self {
             initial_state,
             input,
             goal,
+            use_heuristic,
             open: BinaryHeap::new(),
             came_from: NodeMap::default(),
         }
@@ -87,9 +97,11 @@ impl<'a> Solver<'a> {
         }
 
         while let Some(cmp::Reverse(current)) = self.open.pop() {
+            debug!("{:?}", current);
             // El Votante_Convencido tiene una CargaIdeológicaConvencido
             // significativa (mayor que 0.09) [...]
             if !acceptable(current.k_so_far) {
+                debug!(" > not acceptable");
                 continue;
             }
 
@@ -98,12 +110,12 @@ impl<'a> Solver<'a> {
                 path.push(current);
 
                 let mut current = current.node;
-                while let Some(state) = self.came_from.get(current) {
-                    path.push(state.clone());
-                    if state.node == self.initial_state.node {
+                while let Some(came_from) = self.came_from.get(current) {
+                    path.push(came_from.state.clone());
+                    if came_from.state.node == self.initial_state.node {
                         break;
                     }
-                    current = state.node;
+                    current = came_from.state.node;
                 }
 
                 path.reverse();
@@ -111,27 +123,41 @@ impl<'a> Solver<'a> {
             }
 
             for edge in self.input.edges_from(current.node) {
-                // We have no distance information, unfortunately.
-                let cost = current.cost + FIXED_COST;
+                debug!(" > trying edge {:?}", edge);
+                let cost = if self.use_heuristic {
+                    edge.distance.unwrap_or(FIXED_COST)
+                } else {
+                    FIXED_COST
+                };
+                let cost = current.cost + cost;
+
                 let k = current.k_so_far * edge.k;
 
                 // Votante_A_Convencer tiene una CargaIdeológicaAConvencer
                 // resultante significativa (mayor 0.09) [...]
                 if !acceptable(k) {
+                    debug!(" >> not acceptable");
                     continue;
                 }
 
                 // If it worse than the existing best path, we also bail.
-                if let Some(state) = self.came_from.get(edge.to) {
-                    if state.cost <= cost {
+                if let Some(came_from) = self.came_from.get(edge.to) {
+                    if came_from.cost <= cost {
                         // This is what really cuts the recursion and prevents
                         // us from eternally ping-ponging between different
                         // states.
+                        debug!(" >> has a better path {:?}", came_from);
                         continue;
                     }
                 }
 
-                self.came_from.insert(edge.to, current);
+                self.came_from.insert(
+                    edge.to,
+                    CameFrom {
+                        state: current,
+                        cost,
+                    },
+                );
 
                 let new_state = State {
                     node: edge.to,
