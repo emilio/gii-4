@@ -1,5 +1,5 @@
-use std::error::Error;
 use std::collections::HashMap;
+use std::error::Error;
 
 /// A node id is just a sequential index in an array.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
@@ -90,7 +90,10 @@ impl<T> NodeMap<T> {
 
     /// Iterates over all members of the map.
     pub fn iter(&self) -> impl Iterator<Item = (NodeId, &T)> {
-        self.store.iter().enumerate().filter_map(|(i, v)| Some((NodeId(i), v.as_ref()?)))
+        self.store
+            .iter()
+            .enumerate()
+            .filter_map(|(i, v)| Some((NodeId(i), v.as_ref()?)))
     }
 }
 
@@ -119,10 +122,8 @@ impl NodeStore {
                 let id = NodeId(self.node_names.len());
                 self.node_names.push(v.key().clone());
                 *v.insert(id)
-            },
-            Entry::Occupied(e) => {
-                *e.get()
             }
+            Entry::Occupied(e) => *e.get(),
         }
     }
 
@@ -140,7 +141,9 @@ struct Contacts {
 
 impl Contacts {
     fn get_mut(&mut self, node: NodeId) -> &mut Vec<Contact> {
-        self.contacts.get_mut(node).get_or_insert_with(Default::default)
+        self.contacts
+            .get_mut(node)
+            .get_or_insert_with(Default::default)
     }
 
     fn get(&self, node: NodeId) -> &[Contact] {
@@ -173,7 +176,9 @@ impl Input {
             match pieces.next() {
                 Some(name) => {
                     if name != "contacto" {
-                        return Err(format!("Unknown function name {} at line {}", name, lineno).into());
+                        return Err(
+                            format!("Unknown function name {} at line {}", name, lineno).into()
+                        );
                     }
                 }
                 None => continue,
@@ -185,7 +190,12 @@ impl Input {
 
             let args = args.split(",").map(|arg| arg.trim()).collect::<Vec<_>>();
             if args.len() != 3 {
-                return Err(format!("Expected three arguments, got {} at line {}", args.len(), lineno).into());
+                return Err(format!(
+                    "Expected three arguments, got {} at line {}",
+                    args.len(),
+                    lineno
+                )
+                .into());
             }
 
             let first = nodes.get_or_insert(args[0].to_owned());
@@ -232,7 +242,12 @@ impl Input {
         for node in self.nodes() {
             println!("Edges from {} ({:?})", self.node_name(node), node);
             for edge in self.edges_from(node) {
-                println!("  -> {} ({:?}) with k={}", self.node_name(edge.to), edge.to, edge.k);
+                println!(
+                    "  -> {} ({:?}) with k={}",
+                    self.node_name(edge.to),
+                    edge.to,
+                    edge.k
+                );
             }
         }
     }

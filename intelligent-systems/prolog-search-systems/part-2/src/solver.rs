@@ -23,7 +23,7 @@ pub struct Solution {
     pub path: Vec<State>,
 }
 
-impl PartialOrd for State{
+impl PartialOrd for State {
     fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
         Some(
             self.cost
@@ -31,7 +31,7 @@ impl PartialOrd for State{
                 .expect("No NaN and other shenanigans here!")
                 // These two are mostly to make PartialOrd match PartialEq.
                 .then_with(|| self.node.cmp(&other.node))
-                .then_with(|| self.k_so_far.partial_cmp(&other.k_so_far).unwrap())
+                .then_with(|| self.k_so_far.partial_cmp(&other.k_so_far).unwrap()),
         )
     }
 }
