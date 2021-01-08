@@ -3,6 +3,8 @@ include ../../session.mk
 WINEPREFIX?="$(HOME)/.wine32"
 WINEBUILDPATH?="$(HOME)/src/wine/build"
 
+informe.pdf: inc/actors.tex inc/use-cases.tex inc/defs.sty
+
 # Runs EZEstimate under wine. Because life sucks I somehow need a custom
 # wine32-only build rather than Fedora's build.
 install:

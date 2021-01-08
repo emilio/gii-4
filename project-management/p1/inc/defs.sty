@@ -1,0 +1,37 @@
+\newcommand\reporttitle{Servicio de emergencias}
+\newcommand\reportsubtitle{Práctica obligatoria Ingeniería del Software II}
+\newcommand\reportdate{4 de diciembre de 2015}
+\newcommand\reportauthors{E. Cobos, C. Herrera, V. Barrueco, R. Arroyo, C. Bonal, I. Dragomirov}
+\newcommand\version{0.9 (\reportdate)}
+
+\newcommand\aftertabularx{\vspace{5pt plus 10pt minus 2pt}}
+\NewEnviron{customtable}[1][|l|X|]{
+    \begin{tabularx}{\linewidth}{#1}
+        \BODY
+    \end{tabularx}
+    \aftertabularx
+}
+
+\newkeycommand\actor[id=x,version=\version][6]{
+\begin{customtable}
+    \hline
+    \textbf{ACT-\commandkey{id}} & \textbf{#1} \\ \hline
+    \textbf{Versión} & \commandkey{version} \\ \hline
+    \textbf{Autores} & #2 \\ \hline
+    \textbf{Fuentes} & #3 \\ \hline
+    \textbf{Descripción} & #4 \\ \hline
+    \textbf{Complejidad} & #5 \\ \hline
+    \textbf{Razonamiento} & #5 \\ \hline
+\end{customtable}
+}
+
+\newcommand\simpleusecase[5]{
+\begin{customtable}
+    \hline
+    \textbf{Nombre} & \textbf{#1} (#2) \\ \hline
+    \textbf{Autores} & \reportauthors \\ \hline
+    \textbf{Transacciones} & #4 \\ \hline
+    \textbf{Complejidad} & #3 \\ \hline
+    \textbf{Razonamiento} & #5 \\ \hline
+\end{customtable}
+}

@@ -7,6 +7,12 @@ lang: es
 numbersections: true
 links-as-notes: true
 toc: true
+header-includes:
+  - \usepackage{pdfpages}
+  - \usepackage{environ}
+  - \usepackage{tabularx}
+  - \usepackage{keycommand}
+  - \usepackage{inc/defs}
 ---
 
 \clearpage
@@ -32,8 +38,24 @@ Una descripción más detallada de la aplicación y un modelo de casos de uso se
 encuentra en el
 [documento](https://github.com/emilio/softeng-2015/raw/master/final.pdf)
 realizado para la asignatura de Ingeniería de Software, que debería de estar
-adjunto a este informe también. Por brevedad no se incluirán los diagramas
-y descripciones aquí, y haremos referencia a los números de cada caso de uso.
+adjunto a este informe también.
+
+## Paquetes que componen el sistema.
+
+La aplicación se divide en dos paquetes, el paquete `Emergency`, y el paquete
+`Sessions`.
+
+El paquete `Emergency`, recoge todos los casos de uso en los que actúa un
+usuario base de la aplicación (actor `User`), salvo el control de sesiones, que
+se lleva a cabo en el paquete `Sessions`.
+
+## Diagramas de los casos de uso del sistema
+
+\includepdf[pages=70-78, nup=1x2, frame, landscape]{./practica2015.pdf}
+
+## Descripción de los actores del sistema
+
+\input{inc/actors}
 
 ## Valores asignados por caso de uso
 
@@ -41,59 +63,17 @@ Se ha usado los razonamientos derivados de la [documentación de
 IBM](https://www.ibm.com/developerworks/rational/library/edge/09/mar09/collaris_dekker/index.html)
 al respecto.
 
-Nótese por la sección *3.3.2.1. Consideraciones Previas* que en la mayoría de
-los casos de uso se asume la pre-condición de que el usuario ha accedido
-correctamente al sistema. Todos los casos de uso omiten un flujo de excepción si
-el usuario no tiene los permisos necesarios para acceder a el mismo. No
-obstante, he elegido omitir esto de la cuenta de transacciones, asumiendo que
-estas excepciones son genéricas para toda la aplicación y por lo tanto no llevan
-trabajo extra por cada caso de uso diferente.
+Nótese que en la mayoría de los casos de uso se asume la pre-condición de que el
+usuario ha accedido correctamente al sistema. Todos los casos de uso omiten un
+flujo de excepción si el usuario no tiene los permisos necesarios para acceder
+a el mismo. No obstante, he elegido omitir esto de la cuenta de transacciones,
+asumiendo que estas excepciones son genéricas para toda la aplicación y por lo
+tanto no llevan trabajo extra por cada caso de uso diferente.
 
 Generalmente he contado exclusivamente las situaciones de excepción particulares
 a un caso de uso.
 
- * List emergencies (5.3.1): *simple* (2 transacciones)
- * View emergency details (5.3.2): *simple* (2 transacciones). En este caso he
-   contado el flujo de excepción (el usuario no está asignado a una emergencia)
-   como una sola transacción.
- * Add item to inventory (5.3.3): *simple* (1 transacción). He asumido que
-   hay una sola interfaz que añade el item y toda la información en un sólo
-   formulario.
- * Modify inventory stock (5.3.4): *simple* (2 transacciones). El usuario debe
-   seleccionar el item que quiere reponer y posteriormente ajustar el stock.
- * Mark emergency as resolved (5.3.5): *simple* (2 transacciones).
- * List centers (5.3.6): *simple* (1 transacción).
- * Comment on an emergency (5.3.7): *simple* (2 transacciones). En este caso he
-   decidido contar la validación necesaria para el comentario ya que es
-   específica a este caso de uso.
- * Log in into the system (5.3.8): *simple* (2 transacciones). Similarmente
-   he decidido contar la validación necesaria para el comentario ya que es
-   específica a este caso de uso.
- * Add attended person (5.3.9): *simple* (2 transacciones).
- * Write section of the inform (5.3.10): *simple* (3 transacciones).
- * Change dotation accountable (5.3.11): *average* (5 transacciones)
- * Assign dotation to an emergency (5.3.12): *average* (5 transacciones). He
-   contado la excepción particular al seleccionar dotaciones como parte de este
-   caso de uso.
- * Update user (5.3.13): *average* (4 transacciones)
- * List users (5.3.14): *simple* (1 transacción)
- * Destroy user (5.3.15): *simple* (2 transacciones)
- * Log out (5.3.16): *simple* (1 transacción)
- * Report emergency (5.3.17): *average* (5 transacciones)
- * Confirm emergency (5.3.18): *simple* (1 transacción)
- * List vehicles (5.3.19): *simple* (1 transacción)
- * Create vehicle (5.3.20): *simple* (2 transacciones)
- * Update vehicle data (5.3.21): *simple* (1 transacción)
- * Destroy vehicle (5.3.22): *simple* (1 transacción)
- * Create center (5.3.23): *simple* (2 transacciones)
- * Update center (5.3.24): *simple* (2 transacciones)
- * Destroy center (5.3.25): *simple* (2 transacciones)
- * List dotations (5.3.26): *simple* (1 transacción)
- * Create dotation (5.3.27): *simple* (3 transacciones)
- * Update dotation (5.3.28): *simple* (3 transacciones)
- * Destroy dotation (5.3.29): *simple* (3 transacciones)
- * Create user (5.3.30): *simple* (1 transacciones)
- * Check inventory (5.3.31): *average* (4 transacciones)
+\input{inc/use-cases.tex}
 
 # Factores técnicos / del entorno
 
@@ -167,7 +147,7 @@ de la aplicación.
 
 # Interpretación de los resultados y conclusiones
 
-El resultado final nos sale como $3844.372$ horas de esfuerzo (al ratio por
+El resultado final nos sale como $3879.804$ horas de esfuerzo (al ratio por
 defecto de 20h por UCP).
 
 Haciendo algunas cuentas sencillas (160h al mes por un trabajador a tiempo

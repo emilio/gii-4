@@ -1,0 +1,95 @@
+\begin{customtable} \hline
+  \textbf{Nombre} & \textbf{View emergency details} (5.3.2) \\ \hline
+  \textbf{Autores} & \reportauthors \\ \hline
+  \textbf{Descripción} & Selecciona una emergencia y muestra sus detalles \\ \hline
+  Flujo principal & {
+    \begin{tabularx}{\linewidth}{c|X|X}
+       & \textbf{Actor Input} & \textbf{System Response} \\ \hline
+     1 & Select Emergency & \\ \hline
+     2 &  & Check if user is assigned \\ \hline
+     3 &  & Show emergency details
+    \end{tabularx}
+  } \\ \hline
+  Flujo de excepción 1 & {
+    \begin{tabularx}{\linewidth}{c|X|X}
+         & \textbf{Actor Input} & \textbf{System Response} \\ \hline
+       1 & User not assigned to emergency (paso 2 del flujo principal) &  \\ \hline
+       2 & & Show Error Message
+    \end{tabularx}
+  } \\ \hline
+  \textbf{Transacciones} & 2 \\ \hline
+  \textbf{Complejidad} & Simple \\ \hline
+  \textbf{Razonamiento} & Por el número de transacciones, es un caso de uso
+  simple. En este caso he contado el flujo de excepción (el usuario no está
+  asignado a una emergencia) como una sola transacción (\textit{A use
+  case transaction is a "round trip"}, por la documentación de IBM). \\ \hline
+\end{customtable}
+
+\begin{customtable} \hline
+  \textbf{Nombre} & \textbf{Assign dotation to an emergency} (5.3.12) \\ \hline
+  \textbf{Autores} & \reportauthors \\ \hline
+  \textbf{Descripción} & Asigna una dotación para actuar en una emergencia. \\ \hline
+  Flujo principal & {
+    \begin{tabularx}{\linewidth}{c|X|X}
+       & \textbf{Actor Input} & \textbf{System Response} \\ \hline
+     1 & Abrir listado de dotaciones del Centro & \\ \hline
+     2 &  & Mostrar listado de dotaciones \\ \hline
+     3 & Seleccionar dotación & \\ \hline
+     4 &  & Comprobar que la dotación está disponible \\ \hline
+     5 &  & Listar emergencia \\ \hline
+     6 & Confirmar & \\ \hline
+     7 &  & Asignar dotación a emergencia
+    \end{tabularx}
+  } \\ \hline
+  Flujo de excepción 1 & {
+    \begin{tabularx}{\linewidth}{c|X|X}
+         & \textbf{Actor Input} & \textbf{System Response} \\ \hline
+       1 & Seleccionar dotación ocupada (paso 3 del flujo principal) &  \\ \hline
+       2 & & Volver a la pantalla de selección de dotación, con un mensaje de
+             error
+    \end{tabularx}
+  } \\ \hline
+  \textbf{Transacciones} & 5 \\ \hline
+  \textbf{Complejidad} & Media \\ \hline
+  \textbf{Razonamiento} & El número de \textit{round-trips} (idas y vueltas
+  entre el sistema y el actor) es 5, contando con el flujo de excepción. Supera
+  los 3 pero no llega a 7, por lo que podemos considerarlo medio. \\ \hline
+\end{customtable}
+
+\simpleusecase{List emergencies}{5.3.1}{Simple}{2}{}
+\simpleusecase{Add item to inventory}{5.3.3}{Simple}{1}{
+   He asumido que hay una sola interfaz que añade el item y toda la información
+   en un sólo formulario.
+}
+\simpleusecase{Modify inventory stock}{5.3.4}{Simple}{2}{El usuario debe
+   seleccionar el item que quiere reponer y posteriormente ajustar el stock.}
+\simpleusecase{Mark emergency as resolved}{5.3.5}{Simple}{2}{}
+\simpleusecase{List centers}{5.3.6}{Simple}{1}{}
+\simpleusecase{Comment on an emergency}{5.3.7}{Simple}{2}{En este caso he
+   decidido contar la validación necesaria para el comentario ya que es
+   específica a este caso de uso.}
+\simpleusecase{Log in into the system}{5.3.8}{Simple}{2}{Similarmente
+   he decidido contar la validación necesaria para el comentario ya que es
+   específica a este caso de uso.}
+\simpleusecase{Add attended person}{5.3.9}{Simple}{2}{}
+\simpleusecase{Write section of the inform}{5.3.10}{Simple}{3}{}
+\simpleusecase{Change dotation accountable}{5.3.11}{Average}{5}{}
+\simpleusecase{Update user}{5.3.13}{Average}{4}{}
+\simpleusecase{List users}{5.3.14}{Simple}{1}{}
+\simpleusecase{Destroy user}{5.3.15}{Simple}{2}{}
+\simpleusecase{Log out}{5.3.16}{Simple}{1}{}
+\simpleusecase{Report emergency}{5.3.17}{Average}{5}{}
+\simpleusecase{Confirm emergency}{5.3.18}{Simple}{1}{}
+\simpleusecase{List vehicles}{5.3.19}{Simple}{1}{}
+\simpleusecase{Create vehicle}{5.3.20}{Simple}{2}{}
+\simpleusecase{Update vehicle data}{5.3.21}{Simple}{1}{}
+\simpleusecase{Destroy vehicle}{5.3.22}{Simple}{1}{}
+\simpleusecase{Create center}{5.3.23}{Simple}{2}{}
+\simpleusecase{Update center}{5.3.24}{Simple}{2}{}
+\simpleusecase{Destroy center}{5.3.25}{Simple}{2}{}
+\simpleusecase{List dotations}{5.3.26}{Simple}{1}{}
+\simpleusecase{Create dotation}{5.3.27}{Simple}{3}{}
+\simpleusecase{Update dotation}{5.3.28}{Simple}{3}{}
+\simpleusecase{Destroy dotation}{5.3.29}{Simple}{3}{}
+\simpleusecase{Create user}{5.3.30}{Simple}{1}{}
+\simpleusecase{Check inventory}{5.3.31}{Average}{4}{}

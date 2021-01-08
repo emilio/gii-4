@@ -1,0 +1,73 @@
+\actor[id=01]
+{Admin}
+{\reportauthors}
+{}
+{Este actor representa al administrador de la aplicación: Él es el encargado de gestionar dotaciones, centros, vehículos...}
+{Complejo: Es un actor con interfaz de usuario}
+
+\actor[id=02]
+{User}
+{\reportauthors}
+{}
+{Este actor representa a cualquier usuario no administrador de la aplicación.}
+{Complejo}
+{Es un actor con interfaz de usuario}
+
+\actor[id=03]
+{Phone Operator}
+{\reportauthors}
+{}
+{Representa a un operador de teléfono, y es el que da de alta las emergencias en el sistema.}
+{Complejo}
+{Es un actor con interfaz de usuario}
+
+\actor[id=04]
+{Emergency Personal}
+{\reportauthors}
+{}
+{El personal de emergencias, componente de las dotaciones}
+{Complejo}
+{Es un actor con interfaz de usuario}
+
+\actor[id=05]
+{Dotation Accountable}
+{\reportauthors}
+{}
+{El responsable de una dotación}
+{Complejo}
+{Es un actor con interfaz de usuario}
+
+\actor[id=06]
+{Center Manager}
+{\reportauthors}
+{}
+{El responsable del centro}
+{Complejo}
+{Es un actor con interfaz de usuario}
+
+\actor[id=07]
+{Notifications System}
+{\reportauthors}
+{}
+{Sistema de notificaciones}
+{Medio}
+{Es un actor relativamente independiente del resto del sistema, que ofrece
+una API a través de internet}
+
+\actor[id=08]
+{Anonymous User}
+{\reportauthors}
+{}
+{Un usuario no autenticado en el sistema}
+{Complejo}
+{Es un usuario con interfaz}
+
+\actor[id=09]
+{Base User}
+{\reportauthors}
+{}
+{Un usuario autenticado en el sistema}
+{Complejo}
+{Es la base de todo el sistema de usuarios, por lo que tiene muchas
+dependencias, y es un usuario con interfaz}
+
