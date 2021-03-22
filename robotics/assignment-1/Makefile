@@ -8,4 +8,4 @@ build: src/Assignment1.cpp CMakeLists.txt
 
 .PHONY: run
 run: build ${ASSETS}
-	build/Assignment1 assets/reference.png ${ASSETS}
+	build/Assignment1 binarization assets/reference.png ${ASSETS}
