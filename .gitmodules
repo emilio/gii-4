@@ -1,3 +1,6 @@
 [submodule "computer-graphics"]
 	path = computer-graphics
 	url = git@github.com:emilio/cg-2016
+[submodule "robotics/theory-1/reveal.js"]
+	path = robotics/theory-1/reveal.js
+	url = https://github.com/hakimel/reveal.js/
