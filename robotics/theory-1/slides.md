@@ -1,63 +1,110 @@
 ---
 title: UAVs
-theme: white
+theme: solarized
 lang: es
 authors:
   - Emilio Cobos Álvarez
   - Joaquín Furones Hormias
-  - TBD
----
-
-# UAV
-
----
-
-# Índice
-
- 1. Definición
- 2. Clasificación
- 3. Historia
- 4. Ejemplos
- 5. Arquitectura
-
-TODO: Profundizar en algún robot en particular
-
+  - Daniel García González
+header-includes: |
+  <style>
+    img {
+      max-height: 55vh !important;
+    }
+  </style>
 ---
 
 # Definición
 
  * _Uncrewed/Unmanned Aerial Vehicle_
  * En Español: VANT (_Vehículo Aéreo No Tripulado_).
- * AKA "dron"
-
----
-
-# Clasificación
-
- * Pilotado (RPA, _Remotely Piloted Aircraft_) o no pilotado.
-
- * Funcional:
-
-   * Combate
-   * Reconocimiento de terreno
-   * Blancos
-   * Logística (envíos, ...)
-   * Usos civiles / comerciales
-     * Agricultura, recolección de datos, fotografía aérea...
-   * Investigación y desarrollo
-
- * En base a capacidades (altura / peso / velocidad...)
-   * e.g., `https://en.wikipedia.org/wiki/U.S._military_UAS_groups`
 
 ---
 
 # Historia
 
-TODO
+----
 
-# Ejemplos
+![Radioplane OQ3 y su lanzadera (Wright Field, Octubre 1945)](origen-militar.jpg)
 
-TODO (tal vez como parte de la clasificación / historia)
+---
+
+![Quadcóptero Blade 350 QX3](quad.jpg)
+
+---
+
+![Diagrama de un controlador PID](pid.png)
+
+---
+
+![SMS Vulcano](sms-vulcano.png)
+
+---
+
+# Tipos de UAV
+
+---
+
+ * RPA (_Remotely Piloted Aircraft_).
+ * No pilotado.
+ * Mixto.
+
+---
+
+![European Medium Altitude Long Endurance RPAS](euromale-rpa.jpg)
+
+<small>Crédito: DeffiSK @ Wikipedia</small>
+
+---
+
+## Por tipo de uso
+
+---
+
+![UAV de combate General Atomics Avenger, US Military](avenger.jpg)
+
+---
+
+![de Havilland Queen Bee, usado como entrenamiento para anti-aéreos (1945)](queen-bee.jpg)
+
+---
+
+![Dron de reparto](amazon-drone.jpg)
+
+---
+
+![Dron de uso civil para fotografía aérea](camera.jpg)
+
+---
+
+## Por capacidades
+
+---
+
+ * Peso máximo
+ * Altitud operacional
+ * Velocidad.
+ * [https://en.wikipedia.org/wiki/U.S._military_UAS_groups](https://en.wikipedia.org/wiki/U.S._military_UAS_groups)
+
+---
+
+# Primoco UAV
+
+---
+
+![Primoco UAV (uav-stol.com)](primoco.jpg)
+
+---
+
+![Datos técnicos de Primoco UAV One 150](primoco-technical-data.png)
+
+---
+
+# ¿Preguntas?
+
+<!--
+
+---
 
 # Arquitectura
 
@@ -92,3 +139,5 @@ estructura similar a:
   * Suelen ser un SBC (_Single Board Computer_), ya que tiene que operar en
     tiempo real.
   * Suelen estar escritos en C / C++ / Ensamblador / Rust...
+
+-->
