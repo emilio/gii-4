@@ -4,3 +4,6 @@
 [submodule "robotics/theory-1/reveal.js"]
 	path = robotics/theory-1/reveal.js
 	url = https://github.com/hakimel/reveal.js/
+[submodule "robotics/theory-2/reveal.js"]
+	path = robotics/theory-2/reveal.js
+	url = https://github.com/hakimel/reveal.js/
